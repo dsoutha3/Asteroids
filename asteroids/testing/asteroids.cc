@@ -1,7 +1,8 @@
-#include <SDL2/SDL_image.h>
-#include <SDL2/SDL.h>
-#include <iostream>
-#define TRUE 1
+#include "funcs.h"
+//#include <SDL2/SDL_image.h>
+//#include <SDL2/SDL.h>
+//#include <iostream>
+//#define TRUE 1
 
 using namespace std; //for i/o to work w/o std::
 
@@ -14,7 +15,7 @@ SDL_Surface *cards=NULL;
 SDL_Renderer *renderer=NULL;
 //ASTEROID SURFACES
 SDL_Surface *bigBrownAst1=NULL;
-SDL_Surface *bigGreyAst1=NULL:
+SDL_Surface *bigGreyAst1=NULL;
 SDL_Surface *bigGreyAst2=NULL;
 SDL_Surface *medBrownAst1=NULL;
 SDL_Surface *medGreyAst1=NULL;
@@ -35,20 +36,16 @@ class computer
 };
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
-	bigBrownAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-	bigGreyAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-	bigGreyAst2=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-	bigBrownAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-	bigGreyAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-	bigGreyAst2=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
-
-
-
-
-
-
-
-
+	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp")
+	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp")
+	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp")
+	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp")
+	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp")
+	medGreyAst2=SDL_LoadBMP("../src/images/medGreyAst2.bmp")
+	smallGreyAst1=SDL_LoadBMP("../src/images/smallGreyAst1.bmp")
+	smallGreyAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp")
+	smallBrownAst1=SDL_LoadBMP("../src/images/smallBrowAst1.bmp")
+	smallBrownAst2=SDL_LoadBMP("../src/images/smallBrownAst2.bmp")
 }
 int main(int argc,char* argv[])
 {
@@ -60,12 +57,11 @@ int main(int argc,char* argv[])
 		cout << "image loading error: " << SDL_GetError();	
 		SDL_Event mainEv;
 		while(running)
-		{	
+		{
 			while(SDL_PollEvent(&mainEv) !=0)
-			{								
-							
+			{
 				if(mainEv.type==SDL_QUIT)
-				{					
+				{
 					running=false;
 				}
 				SDL_UpdateWindowSurface(window);
