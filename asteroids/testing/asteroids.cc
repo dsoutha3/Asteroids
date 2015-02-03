@@ -37,6 +37,7 @@ class computer
 
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
+<<<<<<< HEAD
 	bigBrownAst1=SDL_LoadBMP("../src/images/SDL_bigBrownAst1.bmp");
 	bigGreyAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp");
 	bigGreyAst2=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp");
@@ -56,6 +57,19 @@ class player
 	int lives, score;
 };
 
+=======
+	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp")
+	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp")
+	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp")
+	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp")
+	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp")
+	medGreyAst2=SDL_LoadBMP("../src/images/medGreyAst2.bmp")
+	smallGreyAst1=SDL_LoadBMP("../src/images/smallGreyAst1.bmp")
+	smallGreyAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp")
+	smallBrownAst1=SDL_LoadBMP("../src/images/smallBrowAst1.bmp")
+	smallBrownAst2=SDL_LoadBMP("../src/images/smallBrownAst2.bmp")
+}
+>>>>>>> 52dca6616cbc65e5eb3df1e8dcc741a119f0314c
 int main(int argc,char* argv[])
 {
 	bool running = true;
