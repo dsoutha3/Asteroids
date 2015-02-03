@@ -1,0 +1,1 @@
+g++ -o hello 01_hello_SDL.cpp `sdl2 - config --libs --cflags` 
