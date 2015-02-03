@@ -35,16 +35,20 @@ class computer
 };
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
-	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp")
-	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp")
-	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp")
-	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp")
-	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp")
-	medGreyAst2=SDL_LoadBMP("../src/images/medGreyAst2.bmp")
-	smallGreyAst1=SDL_LoadBMP("../src/images/smallGreyAst1.bmp")
-	smallGreyAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp")
-	smallBrownAst1=SDL_LoadBMP("../src/images/medGreyAst2.bmp")
-	smallBrownAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp")
+	bigBrownAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+	bigGreyAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+	bigGreyAst2=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+	bigBrownAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+	bigGreyAst1=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+	bigGreyAst2=SDL_LoadBMP("./images/SDL_bigBrownAst1.bmp")
+
+
+
+
+
+
+
+
 }
 int main(int argc,char* argv[])
 {
