@@ -36,11 +36,10 @@ class computer
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");	
-	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
 	SDL_SetColorKey(bigGreyAst1,SDL_TRUE,SDL_MapRGB(bigGreyAst1->format,0,238,0));
-	//if(bigBrownAst1==NULL)
+	if(bigBrownAst1==NULL)
 	cout << "image loading error: " << SDL_GetError();	
-	
+	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
 	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp");
 	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp");
 	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp");
