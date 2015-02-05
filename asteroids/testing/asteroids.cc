@@ -2,8 +2,8 @@
 //#include <SDL2/SDL_image.h>
 //#include <SDL2/SDL.h>
 //#include <iostream>
-//#define TRUE 1
-
+#define TRUE 1
+#define FALSE 0
 using namespace std; //for i/o to work w/o std::
 
 const int SCREEN_WIDTH=640;
@@ -31,28 +31,42 @@ void createWindow();
 class computer
 {
 	public:
-	computer();
+	int waveCompleted;
+	
+	computer();	
+	int makeWave(void);
 	~computer();
 };
+
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
-	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp")
-	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp")
-	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp")
-	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp")
-	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp")
-	medGreyAst2=SDL_LoadBMP("../src/images/medGreyAst2.bmp")
-	smallGreyAst1=SDL_LoadBMP("../src/images/smallGreyAst1.bmp")
-	smallGreyAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp")
-	smallBrownAst1=SDL_LoadBMP("../src/images/smallBrowAst1.bmp")
-	smallBrownAst2=SDL_LoadBMP("../src/images/smallBrownAst2.bmp")
+	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");
+	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
+	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp");
+	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp");
+	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp");
+	medGreyAst2=SDL_LoadBMP("../src/images/medGreyAst2.bmp");
+	smallGreyAst1=SDL_LoadBMP("../src/images/smallGreyAst1.bmp");
+	smallGreyAst2=SDL_LoadBMP("../src/images/smallGreyAst2.bmp");
+	smallBrownAst1=SDL_LoadBMP("../src/images/smallBrowAst1.bmp");
+	smallBrownAst2=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
 }
+
+int computer::makeWave(void)
+{
+//ASTEROID OFFSETS FOR MOVEMENT
+SDL_Rect OFFSET_bigBrownAst1;
+OFFSET_bigBrownAst1.x=50;
+OFFSET_bigBrownAst1.y=50;
+return (waveCompleted);
+}
+
 int main(int argc,char* argv[])
 {
 	bool running = true;	
 	createWindow();
 	//int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;
-	cards = SDL_LoadBMP("./images/bigBrownAst.bmp");	
+	cards = SDL_LoadBMP("../src/images/bigBrownAst.bmp");	
 	if(cards==NULL)
 		cout << "image loading error: " << SDL_GetError();	
 		SDL_Event mainEv;
