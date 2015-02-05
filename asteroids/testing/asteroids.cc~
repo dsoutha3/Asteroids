@@ -19,8 +19,20 @@ SDL_Surface *smallGreyAst2=NULL;
 SDL_Surface *smallBrownAst1=NULL;
 SDL_Surface *smallBrownAst2=NULL;
 
+
 //FUNCTION DECLARATIONS
 void createWindow();
+
+//class for player
+class player
+{
+	public:
+	player();
+	~player();
+
+	private:
+	int lives, score;
+};
 
 //class for asteroid waves and various computer duties
 class computer
@@ -36,10 +48,11 @@ class computer
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 	bigBrownAst1=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");	
-	SDL_SetColorKey(bigGreyAst1,SDL_TRUE,SDL_MapRGB(bigGreyAst1->format,0,238,0));
 	if(bigBrownAst1==NULL)
 	cout << "image loading error: " << SDL_GetError();	
 	bigGreyAst1=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
+	SDL_SetColorKey(bigGreyAst1,SDL_TRUE,SDL_MapRGB(bigGreyAst1->format,0,238,0));
+	SDL_SetColorKey(bigBrownAst1,SDL_TRUE,SDL_MapRGB(bigBrownAst1->format,0,238,0));	
 	bigGreyAst2=SDL_LoadBMP("../src/images/bigGreyAst2.bmp");
 	medBrownAst1=SDL_LoadBMP("../src/images/medBrownAst1.bmp");
 	medGreyAst1=SDL_LoadBMP("../src/images/medGreyAst1.bmp");
@@ -54,15 +67,19 @@ int computer::makeWave(void)
 {
 //ASTEROID OFFSETS FOR MOVEMENT
 
-//SDL_Rect OFFSET_bigBrownAst1;
-//OFFSET_bigBrownAst1.x=50;
-//OFFSET_bigBrownAst1.y=50;
+
 waveCompleted=TRUE;
 return (waveCompleted);
 }
 
 int main(int argc,char* argv[])
 {
+	SDL_Rect offset;
+	offset.x=50;
+	offset.y=50;
+	int xVel=5;
+	int yVel=5;
+
 	bool running = true;	
 	createWindow();
 	//int imgFlags = IMG_INIT_PNG | IMG_INIT_JPG;		
@@ -77,16 +94,23 @@ int main(int argc,char* argv[])
 				}
 				computer START;
 				int beatWave=START.makeWave();	
-				SDL_UpdateWindowSurface(window);			
-				SDL_BlitSurface(bigGreyAst1,NULL,screen,NULL);			
+
+				//SDL_BlitSurface(ast, NULL, screen, &offset);	will use later for movement	
 			}	
-		}
+				SDL_UpdateWindowSurface(window);			
+				SDL_BlitSurface(bigBrownAst1,NULL,screen,&offset);
+				SDL_UpdateWindowSurface(window);
+				offset.x+=xVel;
+				offset.y+=yVel;
+				SDL_Delay(20);		
+	}
 	//if(!(IMG_Init(imgFlags)& imgFlags))
 	//	cout << "error intitializing image: "<< IMG_GetError() << endl;
 	 //else
 
 	//prevent heap mem leaks.
 	//SDL_FreeSurface();	
+	SDL_FreeSurface(bigBrownAst1);	
 	SDL_FreeSurface(bigGreyAst1);	
 	//SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window); //destroy window created.
