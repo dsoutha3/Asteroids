@@ -11,6 +11,9 @@ SDL_Surface *bigAst[3]={NULL};
 SDL_Surface *medAst[2]={NULL};
 SDL_Surface *smallAst[3]={NULL};
 SDL_Rect bigAstPos[2];
+//Alien
+SDL_Surface * alien=NULL;
+
 int rndVelX[3]; 
 int rndVelY[3];
 
@@ -73,6 +76,7 @@ computer::~computer() //destructor frees all images and their memory, then quits
 	SDL_FreeSurface(smallAst[i]);
 	i++; }
 	
+
 	SDL_DestroyWindow(window); //destroy window created.
 	SDL_Quit(); // quit all SDL subsystems.
 }
@@ -130,7 +134,6 @@ int main(int argc,char* argv[])
 	createWindow();
 	computer START;	
 	START.getStartPos();	
-	
 	//To get several velocitys for differnt images 
 	for (j=0;j<6;j++)
 	{					
@@ -140,6 +143,7 @@ int main(int argc,char* argv[])
 	SDL_Event mainEv;
 		while(running)
 		{
+						
 			j=k=0; //loop back to 0 to keep loops active in event.	
 			while(SDL_PollEvent(&mainEv) !=0)
 			{
@@ -165,8 +169,7 @@ int main(int argc,char* argv[])
 				}
 				for (i=0;i<3;i++) //blit first wave of big asteroids			{
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);
-			
-				
+
 				for(halfK=0;halfK<3;halfK++) //to loops velocitys
 				{
 					bigAstPos[halfK].x+=rndVel[k]; //K increase evey two times that halfk does 
