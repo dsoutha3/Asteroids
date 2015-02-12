@@ -15,8 +15,7 @@ SDL_Rect bigAstPos[2];
 //Alien
 SDL_Surface * alien=NULL;
 
-//Player
-SDL_Surface * playerImg=NULL;
+//StartMenu
 
 int rndVelX[3];
 int rndVelY[3];
@@ -31,21 +30,32 @@ class player
 	public:
 	player();
 	~player();
+	int getScore();
+	void setScore(int);
+	SDL_Surface *playerImg=NULL;
+	SDL_Rect playerPos;
+
 
 	private:
 	int playerX, playerY, lives, score;
+
 
 };
 
 player::player()//constructor for player
 {
-	this->playerX = (SCREEN_HEIGHT / 2);
-	this->playerY = (SCREEN_WIDTH / 2);
+	playerPos.x=(SCREEN_WIDTH /2);
+	playerPos.y=(SCREEN_HEIGHT /2);
+
 	this->lives = 3;
 	this->score = 0;
 
-	playerImg=SDL_LoadBMP("../src/images/AlienShip.bmp");
-	SDL_SetColorKey(playerImg,SDL_TRUE,SDL_MapRGB(playerImg->format,0,238,0));
+	playerImg=SDL_LoadBMP("../src/images/playerShip.bmp");
+	SDL_SetColorKey(playerImg,SDL_TRUE,SDL_MapRGB(playerImg->format,0,128,0));
+}
+
+player::~player()
+{
 }
 
 //class for asteroids and various computer duties
@@ -56,13 +66,26 @@ class computer
 	void getStartPos(void);
 	int getVel(void);
 	int gameStatus(void);
+	SDL_Surface *startImg=NULL;
+	SDL_Rect startPos;
 	~computer();
 };
+
+int player::getScore()
+{
+	return (this->score);
+}
+
+void player::setScore(int value)
+{
+	this->score = this->score + value;
+}
 
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 
 		int i=0;
+		startImg=SDL_LoadBMP("../src/images/start.bmp");
 		bigAst[0]=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");
 		bigAst[1]=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
 		bigAst[2]=SDL_LoadBMP("../src/images/bigGreyAst2.bmp");
@@ -74,11 +97,12 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		smallAst[2]=SDL_LoadBMP("../src/images/smallBrowAst1.bmp");
 		smallAst[3]=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
 
+
 	for(i=0;i<3;i++){
 		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,238,0));
-//		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,8,0));
 
 	}
+
 }
 
 computer::~computer() //destructor frees all images and their memory, then quits SDL.
@@ -182,11 +206,33 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int i=0,j=0,k=0,halfK=0,rndVel[6];
+	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6];
 	bool running = true;
 	createWindow();
 	computer START;
 	START.getStartPos();
+	player PLAYER;
+
+	//start screen
+	SDL_BlitSurface(START.startImg, NULL, screen, NULL);
+	SDL_UpdateWindowSurface(window);
+	SDL_Event e;
+		while(menu != 1)
+		{
+			while( SDL_PollEvent( &e) != 0)
+			{
+				switch(e.key.keysym.sym)
+				{
+					case SDLK_RETURN:
+					menu = 1;break;
+
+					default:
+					break;
+				}
+			}
+		}
+
+
 	//To get several velocitys for differnt images
 	for (j=0;j<6;j++)
 	{
@@ -196,6 +242,7 @@ int main(int argc,char* argv[])
 	SDL_Event mainEv;
 		while(running)
 		{
+
 			j=k=0; //loop back to 0 to keep loops active in event.
 			while(SDL_PollEvent(&mainEv) !=0)
 			{
@@ -204,9 +251,31 @@ int main(int argc,char* argv[])
 					running=false;
 				}
 			}
-
 				SDL_UpdateWindowSurface(window);
-				SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));  //re-paint black to prevent smear	
+				SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));  //re-paint black to prevent smear
+
+				//space ship blit
+				SDL_BlitSurface(PLAYER.playerImg, NULL, screen, &PLAYER.playerPos);
+					//ship movement
+					while( SDL_PollEvent( &e) != 0)
+					{
+						switch(e.key.keysym.sym)
+						{
+							case SDLK_UP:
+							PLAYER.playerPos.y = PLAYER.playerPos.y-3;
+							break;
+
+							case SDLK_ESCAPE:
+							exit(0);
+							break;
+
+							default:
+							break;
+						}
+					}
+
+
+
 
 				for(j=0;j<3;j++) //off-screen detection, wrap back around for all images
 				{
@@ -219,6 +288,7 @@ int main(int argc,char* argv[])
 					else if(bigAstPos[j].y<=0)
 						bigAstPos[j].y=SCREEN_HEIGHT;
 				}
+
 				for (i=0;i<3;i++) //blit first wave of big asteroids			{
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);
 
@@ -233,6 +303,7 @@ int main(int argc,char* argv[])
 				//bigAstPos[k].x+=rndVel[4];
 				//bigAstPos[k].y+=rndVel[5];
 				SDL_Delay(20);
+
 		}
 
 		return(0);
