@@ -16,6 +16,7 @@ SDL_Rect bigAstPos[3];
 SDL_Surface *alienShip=NULL;
 SDL_Rect alienShipPos;
 
+
 //StartMenu
 
 int rndVelX[3];
@@ -130,12 +131,9 @@ computer::~computer() //destructor frees all images and their memory, then quits
 /*
 int computer::gameStatus(void)//will later use to determine if another wave will start
 {
-
 //	int waveStatus = FALSE;
-
 	private:
 	int lives, score;
-
 return (waveStatus);
 };
 */
@@ -185,7 +183,7 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6];
+	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],playerVel=0;
 	bool running = true;
 	createWindow();
 	computer START;
@@ -198,6 +196,7 @@ int main(int argc,char* argv[])
 	SDL_BlitSurface(START.startImg, NULL, screen, NULL);
 	SDL_UpdateWindowSurface(window);
 	SDL_Event e;
+
 		while(menu != 1)
 		{
 			while( SDL_PollEvent( &e) != 0)
@@ -220,7 +219,7 @@ int main(int argc,char* argv[])
 		rndVel[j]=START.getVel();
 	}
 
-	SDL_Event mainEv;
+	SDL_Event mainEv;	
 		while(running)
 		{
 
@@ -238,22 +237,7 @@ int main(int argc,char* argv[])
 				//space ship blit
 				SDL_BlitSurface(PLAYER.playerImg, NULL, screen, &PLAYER.playerPos);
 					//ship movement
-					while( SDL_PollEvent( &e) != 0)
-					{
-						switch(e.key.keysym.sym)
-						{
-							case SDLK_UP:
-							PLAYER.playerPos.y = PLAYER.playerPos.y-3;
-							break;
-
-							case SDLK_ESCAPE:
-							exit(0);
-							break;
-
-							default:
-							break;
-						}
-					}
+					
 
 
 
@@ -280,6 +264,52 @@ int main(int argc,char* argv[])
 					else if(alienShipPos.y<=0)
 						alienShipPos.y=SCREEN_HEIGHT;							
 	
+				//off-screen detecion, wrap back around for player
+					if (PLAYER.playerPos.x>=SCREEN_WIDTH-65)
+						PLAYER.playerPos.x=10;
+					else if (PLAYER.playerPos.x<=9)
+						PLAYER.playerPos.x=SCREEN_WIDTH-80;
+					if (PLAYER.playerPos.y>=SCREEN_HEIGHT)
+						PLAYER.playerPos.y=2;
+					else if(PLAYER.playerPos.y<=0)
+						PLAYER.playerPos.y=SCREEN_HEIGHT-10;	
+
+
+				
+				//SDL_Delay(25); //so all key presses are read
+				
+				if(SDL_PollEvent( &e))
+				{
+					if( e.type == SDL_KEYDOWN && e.key.repeat == 0)
+					{	
+						switch(e.key.keysym.sym)
+						{
+							case SDLK_UP:
+							playerVel=-6;
+							break;
+
+							case SDLK_ESCAPE:
+							exit(0);
+							break;
+
+							default:
+							break;
+						}
+					}
+								
+					else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
+					{	
+						switch(e.key.keysym.sym)
+						{
+							case SDLK_UP:					
+							playerVel=0;
+							break;
+						}
+					}	
+				}				
+				
+				PLAYER.playerPos.y+=playerVel;
+
 				for (i=0;i<3;i++) //blit first wave of big asteroids		
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);
 
@@ -294,7 +324,7 @@ int main(int argc,char* argv[])
 				
 				enableAlienPilot();
 				
-				SDL_Delay(20);
+				
 
 		}
 
@@ -378,4 +408,3 @@ void enableAlienPilot()
 		}
 	}						
 }
-
