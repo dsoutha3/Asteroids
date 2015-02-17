@@ -190,7 +190,7 @@ int main(int argc,char* argv[])
 	START.getStartPos();
 	player PLAYER;
 	//alien start pos	
-	alienShipPos.x=(.5*SCREEN_WIDTH);
+	alienShipPos.x=SCREEN_HEIGHT;
 	alienShipPos.y=-10;
 	//start screen
 	SDL_BlitSurface(START.startImg, NULL, screen, NULL);
@@ -256,13 +256,13 @@ int main(int argc,char* argv[])
 
 				//off-screen detection, wrap back around for alienShip
 					if (alienShipPos.x>=SCREEN_WIDTH-65)
-						alienShipPos.x=10;
-					else if (alienShipPos.x<=9)
+						alienShipPos.x=20;
+					else if (alienShipPos.x<=15)
 						alienShipPos.x=SCREEN_WIDTH-80;
-					if (alienShipPos.y>=SCREEN_HEIGHT)
-						alienShipPos.y=0;
-					else if(alienShipPos.y<=0)
-						alienShipPos.y=SCREEN_HEIGHT;							
+					if (alienShipPos.y>=SCREEN_HEIGHT-80)
+						alienShipPos.y=22;
+					else if(alienShipPos.y<=18)
+						alienShipPos.y=SCREEN_HEIGHT-85;							
 	
 				//off-screen detecion, wrap back around for player
 					if (PLAYER.playerPos.x>=SCREEN_WIDTH-65)
@@ -276,7 +276,7 @@ int main(int argc,char* argv[])
 
 
 				
-				//SDL_Delay(25); //so all key presses are read
+				SDL_Delay(25); //so all key presses are read
 				
 				if(SDL_PollEvent( &e))
 				{
@@ -307,7 +307,7 @@ int main(int argc,char* argv[])
 						}
 					}	
 				}				
-				
+				//player velocity adjustments
 				PLAYER.playerPos.y+=playerVel;
 
 				for (i=0;i<3;i++) //blit first wave of big asteroids		
@@ -354,8 +354,9 @@ void createWindow()
 void enableAlienPilot()
 {
 	
-	alienShipPos.y-=3;//start moving
+	//start moving
 	alienShipPos.x+=3;
+	alienShipPos.y-=2;
 	int l=0;	
 	for(l=0;l<3;l++)
 	{						
@@ -381,7 +382,7 @@ void enableAlienPilot()
 					//Asteroid coming up toward bottom right corner of ship.
 		else if(((bigAstPos[l].x<=alienShipPos.x+180)&&(bigAstPos[l].x>=alienShipPos.x+100))&&((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100)))
 		{
-			alienShipPos.x-=7;
+			alienShipPos.x-=10;
 			alienShipPos.y+=7;
 		}
 					//Asteroid coming toward left side of ship.
@@ -392,13 +393,13 @@ void enableAlienPilot()
 					//Asteroid coming toward mid right of ship.
 		else if(((bigAstPos[l].y>=alienShipPos.y+5)&&(bigAstPos[l].y<=alienShipPos.y+95))&&((bigAstPos[l].x>=alienShipPos.x+180)&&(bigAstPos[l].x<=alienShipPos.x)))
 		{
-			alienShipPos.x-=7;
+			alienShipPos.x-=10;
 		}
 					//Asteroid coming toward top side of ship.
 		else if(((bigAstPos[l].y>=alienShipPos.y-80)&&(bigAstPos[l].y<=alienShipPos.y))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
 		{
 			alienShipPos.y+=14;
-			alienShipPos.x-=7;
+			alienShipPos.x-=10;
 		}
 					//Asteroid coming from back side.
 		else if(((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
