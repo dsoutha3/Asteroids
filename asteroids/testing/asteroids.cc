@@ -5,7 +5,6 @@
 
 SDL_Window *window=NULL;
 SDL_Surface *screen=NULL;
-
 //ASTEROID SURFACES
 SDL_Surface *bigAst[3]={NULL};
 SDL_Surface *medAst[2]={NULL};
@@ -14,8 +13,9 @@ SDL_Rect bigAstPos[3];
 
 //Alien
 SDL_Surface *alienShip=NULL;
+SDL_Surface *aLazer=NULL;
 SDL_Rect alienShipPos;
-
+SDL_Rect aLazerPos;
 
 //StartMenu
 
@@ -34,9 +34,10 @@ class player
 	~player();
 	int getScore();
 	void setScore(int);
+		
 	SDL_Surface *playerImg=NULL;
 	SDL_Rect playerPos;
-
+	
 
 	private:
 	int playerX, playerY, lives, score;
@@ -99,7 +100,7 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		smallAst[2]=SDL_LoadBMP("../src/images/smallBrowAst1.bmp");
 		smallAst[3]=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
 		alienShip=SDL_LoadBMP("../src/images/alienShip.bmp");
-
+		aLazer=SDL_LoadBMP("../src/images/aLazer.bmp");
 	for(i=0;i<3;i++){
 		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,238,0));
 
@@ -122,8 +123,8 @@ computer::~computer() //destructor frees all images and their memory, then quits
 	while(i<4){
 	SDL_FreeSurface(smallAst[i]);
 	i++; }
-
-
+	SDL_FreeSurface(aLazer);
+	
 	SDL_DestroyWindow(window); //destroy window created.
 	SDL_Quit(); // quit all SDL subsystems.
 }
@@ -283,7 +284,8 @@ int main(int argc,char* argv[])
 					if( e.type == SDL_KEYDOWN && e.key.repeat == 0)
 					{	
 						switch(e.key.keysym.sym)
-						{
+						{			
+														
 							case SDLK_UP:
 							playerVel=-6;
 							break;
@@ -314,7 +316,9 @@ int main(int argc,char* argv[])
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);
 
 				SDL_BlitSurface(alienShip,NULL,screen,&alienShipPos);//blit alien
-
+				
+				
+								
 				for(halfK=0;halfK<3;halfK++) //to loops velocitys
 				{
 					bigAstPos[halfK].x+=rndVel[k]; //K increase evey two times that halfk does
@@ -323,8 +327,11 @@ int main(int argc,char* argv[])
 				}
 				
 				enableAlienPilot();
+				SDL_BlitSurface(aLazer,NULL,screen,&aLazerPos);//blit Lazer
 				
-				
+				aLazerPos.x=alienShipPos.x+(.41*alienShip->w);
+				aLazerPos.y=alienShipPos.y; 
+				aLazerPos.x+=7;	
 
 		}
 
