@@ -13,11 +13,11 @@ SDL_Rect bigAstPos[3];
 
 //Alien
 SDL_Surface *alienShip=NULL;
-SDL_Surface *aLazer=NULL;
-SDL_Surface *aLazerCover=NULL;
+SDL_Surface *aLazer[3]={NULL};
+SDL_Surface *aLazerCover[3]={NULL};
 SDL_Rect alienShipPos;
-SDL_Rect aLazerPos;
-SDL_Rect aLazerCoverPos;
+SDL_Rect aLazerPos[3];
+SDL_Rect aLazerCoverPos[3];
 //StartMenu
 
 int rndVelX[3];
@@ -101,8 +101,12 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		smallAst[2]=SDL_LoadBMP("../src/images/smallBrowAst1.bmp");
 		smallAst[3]=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
 		alienShip=SDL_LoadBMP("../src/images/alienShip.bmp");
-		aLazer=SDL_LoadBMP("../src/images/aLazer.bmp");
-		aLazerCover=SDL_LoadBMP("../src/images/aLazerCover.bmp");
+		aLazer[0]=SDL_LoadBMP("../src/images/aLazer.bmp");
+		aLazer[1]=SDL_LoadBMP("../src/images/aLazer.bmp");
+		aLazer[2]=SDL_LoadBMP("../src/images/aLazer.bmp");
+		aLazerCover[0]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
+		aLazerCover[1]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
+		aLazerCover[2]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
 	for(i=0;i<3;i++){
 		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,238,0));
 
@@ -119,14 +123,15 @@ computer::~computer() //destructor frees all images and their memory, then quits
 		SDL_FreeSurface(bigAst[i]);
 		SDL_FreeSurface(medAst[i]);
 		SDL_FreeSurface(smallAst[i]);
+		SDL_FreeSurface(aLazer[i]);
+		SDL_FreeSurface(aLazerCover[i]);		
 		i++;
 	}
 
 	while(i<4){
 	SDL_FreeSurface(smallAst[i]);
 	i++; }
-	SDL_FreeSurface(aLazer);
-	SDL_FreeSurface(aLazerCover);
+
 	SDL_DestroyWindow(window); //destroy window created.
 	SDL_Quit(); // quit all SDL subsystems.
 }
@@ -261,10 +266,6 @@ int main(int argc,char* argv[])
 				//off-screen detection, wrap back around for alienShip
 					if (alienShipPos.x>=SCREEN_WIDTH-65)
 						alienShipPos.x=20;
-					//else if (alienShipPos.x<=15)
-					//	alienShipPos.x=SCREEN_WIDTH-80;
-					//if (alienShipPos.y>=SCREEN_HEIGHT-80)
-					//	alienShipPos.y=22;
 					else if(alienShipPos.y<=14)
 						alienShipPos.y=SCREEN_HEIGHT-90;							
 	
@@ -315,9 +316,12 @@ int main(int argc,char* argv[])
 				//player velocity adjustments
 				PLAYER.playerPos.y+=playerVel;
 
-				for (i=0;i<3;i++) //blit first wave of big asteroids		
-					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);
-
+				for (i=0;i<3;i++) 	
+				{					
+					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);//blit first wave of big asteroids	
+					SDL_BlitSurface(aLazer[i],NULL,screen,&aLazerPos[i]);//blit Lazers
+					SDL_BlitSurface(aLazerCover[i],NULL,screen,&aLazerCoverPos[i]);
+				}
 				SDL_BlitSurface(alienShip,NULL,screen,&alienShipPos);//blit alien
 				
 				
@@ -330,22 +334,45 @@ int main(int argc,char* argv[])
 				}
 				
 				enableAlienPilot();
-				SDL_BlitSurface(aLazer,NULL,screen,&aLazerPos);//blit Lazer
-				SDL_BlitSurface(aLazerCover,NULL,screen,&aLazerCoverPos);		
+				//while (				
+				//SDL_BlitSurface(aLazer[0],NULL,screen,&aLazerPos[0]);//blit Lazer
+						
+				//SDL_BlitSurface(aLazer[1],NULL,screen,&aLazerPos[1]);//blit Lazer
+				//SDL_BlitSurface(aLazer[2],NULL,screen,&aLazerPos[2]);//blit Lazer
+				//SDL_BlitSurface(aLazerCover[0],NULL,screen,&aLazerCoverPos[0]);
 				TIME.start();
 				currentT=TIME.getTime();
 				cout<<currentT<<endl;
 				
 				if (currentT<1)
 				{				
-					aLazerPos.x=aLazerCoverPos.x=alienShipPos.x+(.46*alienShip->w);
-					aLazerPos.y=aLazerCoverPos.y=alienShipPos.y; 
+					aLazerPos[0].x=aLazerCoverPos[0].x=alienShipPos.x+(.46*alienShip->w);
+					aLazerPos[0].y=aLazerCoverPos[0].y=alienShipPos.y;
+					aLazerPos[1].x=aLazerCoverPos[1].x=alienShipPos.x+10;
+					aLazerPos[1].y=aLazerCoverPos[1].y=alienShipPos.y+(alienShip->h*.75);
+					aLazerPos[2].x=aLazerCoverPos[2].x=alienShipPos.x+(alienShip->w-15);
+					aLazerPos[2].y=aLazerCoverPos[2].y=alienShipPos.y+(alienShip->h*.75);
 				}
 				else
 				{	
-					aLazerCoverPos.x=alienShipPos.x+(.46*alienShip->w);
-					aLazerCoverPos.y=alienShipPos.y; 					
-					aLazerPos.y-=5;
+					aLazerCoverPos[0].x=-30;
+					aLazerCoverPos[0].y=-30;					
+					aLazerPos[0].y-=5;
+					aLazerPos[1].x-=5;
+					aLazerPos[1].y+=5;
+					aLazerPos[2].x+=5;
+					aLazerPos[2].y+=5;
+					for(i=0;i<3;i++)
+					{
+					if (aLazerPos[i].x>=SCREEN_WIDTH)
+						aLazerPos[i].x=0;
+					else if	(aLazerPos[i].x<=0)
+						aLazerPos[i].x=SCREEN_WIDTH;
+					if (aLazerPos[i].y>=SCREEN_HEIGHT)
+						aLazerPos[i].y=0;
+					else if(aLazerPos[i].y<=0)
+						aLazerPos[i].y=SCREEN_HEIGHT;
+					}						
 					if (currentT>=2)
 					{
 						TIME.reset();
