@@ -266,10 +266,6 @@ int main(int argc,char* argv[])
 				//off-screen detection, wrap back around for alienShip
 					if (alienShipPos.x>=SCREEN_WIDTH-65)
 						alienShipPos.x=20;
-					//else if (alienShipPos.x<=15)
-					//	alienShipPos.x=SCREEN_WIDTH-80;
-					//if (alienShipPos.y>=SCREEN_HEIGHT-80)
-					//	alienShipPos.y=22;
 					else if(alienShipPos.y<=14)
 						alienShipPos.y=SCREEN_HEIGHT-90;							
 	
@@ -368,14 +364,14 @@ int main(int argc,char* argv[])
 					aLazerPos[2].y+=5;
 					for(i=0;i<3;i++)
 					{
-						if (aLazerPos[i].x<SCREEN_WIDTH)
+					if (aLazerPos[i].x>=SCREEN_WIDTH)
+						aLazerPos[i].x=0;
+					else if	(aLazerPos[i].x<=0)
 						aLazerPos[i].x=SCREEN_WIDTH;
-						else if (aLazerPos[i].x>SCREEN_WIDTH)
-						aLazerPos[i].x=0;
-						else if (aLazerPos[i].y<=SCREEN_HEIGHT)
+					if (aLazerPos[i].y>=SCREEN_HEIGHT)
+						aLazerPos[i].y=0;
+					else if(aLazerPos[i].y<=0)
 						aLazerPos[i].y=SCREEN_HEIGHT;
-						else if (aLazerPos[i].y>=SCREEN_HEIGHT)
-						aLazerPos[i].x=0;
 					}						
 					if (currentT>=2)
 					{

@@ -334,17 +334,11 @@ int main(int argc,char* argv[])
 				}
 				
 				enableAlienPilot();
-				//while (				
-				//SDL_BlitSurface(aLazer[0],NULL,screen,&aLazerPos[0]);//blit Lazer
-						
-				//SDL_BlitSurface(aLazer[1],NULL,screen,&aLazerPos[1]);//blit Lazer
-				//SDL_BlitSurface(aLazer[2],NULL,screen,&aLazerPos[2]);//blit Lazer
-				//SDL_BlitSurface(aLazerCover[0],NULL,screen,&aLazerCoverPos[0]);
+				//getting time to shoot every 3 seconds.
 				TIME.start();
 				currentT=TIME.getTime();
-				cout<<currentT<<endl;
-				
-				if (currentT<1)
+				//lasers keeping position covered up
+				if (currentT<1) //if less than a second, keep lasers hidden.
 				{				
 					aLazerPos[0].x=aLazerCoverPos[0].x=alienShipPos.x+(.46*alienShip->w);
 					aLazerPos[0].y=aLazerCoverPos[0].y=alienShipPos.y;
@@ -353,15 +347,21 @@ int main(int argc,char* argv[])
 					aLazerPos[2].x=aLazerCoverPos[2].x=alienShipPos.x+(alienShip->w-15);
 					aLazerPos[2].y=aLazerCoverPos[2].y=alienShipPos.y+(alienShip->h*.75);
 				}
-				else
+				else   //else shoot a laser
 				{	
-					aLazerCoverPos[0].x=-30;
-					aLazerCoverPos[0].y=-30;					
+					//veloity for lasers					
+					for(i=0;i<3;i++)					
+					{
+						aLazerCoverPos[i].x=-30; //Move covers off screen
+						aLazerCoverPos[i].y=-30;
+					}					
 					aLazerPos[0].y-=5;
 					aLazerPos[1].x-=5;
 					aLazerPos[1].y+=5;
 					aLazerPos[2].x+=5;
 					aLazerPos[2].y+=5;
+					
+					//wrap around for alien shooting.					
 					for(i=0;i<3;i++)
 					{
 					if (aLazerPos[i].x>=SCREEN_WIDTH)
