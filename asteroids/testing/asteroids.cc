@@ -14,9 +14,10 @@ SDL_Rect bigAstPos[3];
 //Alien
 SDL_Surface *alienShip=NULL;
 SDL_Surface *aLazer=NULL;
+SDL_Surface *aLazerCover=NULL;
 SDL_Rect alienShipPos;
 SDL_Rect aLazerPos;
-
+SDL_Rect aLazerCoverPos;
 //StartMenu
 
 int rndVelX[3];
@@ -101,6 +102,7 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		smallAst[3]=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
 		alienShip=SDL_LoadBMP("../src/images/alienShip.bmp");
 		aLazer=SDL_LoadBMP("../src/images/aLazer.bmp");
+		aLazerCover=SDL_LoadBMP("../src/images/aLazerCover.bmp");
 	for(i=0;i<3;i++){
 		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,238,0));
 
@@ -124,7 +126,7 @@ computer::~computer() //destructor frees all images and their memory, then quits
 	SDL_FreeSurface(smallAst[i]);
 	i++; }
 	SDL_FreeSurface(aLazer);
-	
+	SDL_FreeSurface(aLazerCover);
 	SDL_DestroyWindow(window); //destroy window created.
 	SDL_Quit(); // quit all SDL subsystems.
 }
@@ -184,10 +186,11 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],playerVel=0;
+	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],playerVel=0,currentT=0;
 	bool running = true;
 	createWindow();
 	computer START;
+	timer TIME;
 	START.getStartPos();
 	player PLAYER;
 	//alien start pos	
@@ -258,10 +261,10 @@ int main(int argc,char* argv[])
 				//off-screen detection, wrap back around for alienShip
 					if (alienShipPos.x>=SCREEN_WIDTH-65)
 						alienShipPos.x=20;
-					else if (alienShipPos.x<=15)
-						alienShipPos.x=SCREEN_WIDTH-80;
-					if (alienShipPos.y>=SCREEN_HEIGHT-80)
-						alienShipPos.y=22;
+					//else if (alienShipPos.x<=15)
+					//	alienShipPos.x=SCREEN_WIDTH-80;
+					//if (alienShipPos.y>=SCREEN_HEIGHT-80)
+					//	alienShipPos.y=22;
 					else if(alienShipPos.y<=14)
 						alienShipPos.y=SCREEN_HEIGHT-90;							
 	
@@ -328,10 +331,26 @@ int main(int argc,char* argv[])
 				
 				enableAlienPilot();
 				SDL_BlitSurface(aLazer,NULL,screen,&aLazerPos);//blit Lazer
+				SDL_BlitSurface(aLazerCover,NULL,screen,&aLazerCoverPos);		
+				TIME.start();
+				currentT=TIME.getTime();
+				cout<<currentT<<endl;
 				
-				aLazerPos.x=alienShipPos.x+(.41*alienShip->w);
-				aLazerPos.y=alienShipPos.y; 
-				aLazerPos.x+=7;	
+				if (currentT<1)
+				{				
+					aLazerPos.x=aLazerCoverPos.x=alienShipPos.x+(.46*alienShip->w);
+					aLazerPos.y=aLazerCoverPos.y=alienShipPos.y; 
+				}
+				else
+				{	
+					aLazerCoverPos.x=alienShipPos.x+(.46*alienShip->w);
+					aLazerCoverPos.y=alienShipPos.y; 					
+					aLazerPos.y-=5;
+					if (currentT>=2)
+					{
+						TIME.reset();
+					}	
+				}
 
 		}
 
