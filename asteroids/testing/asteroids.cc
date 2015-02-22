@@ -55,7 +55,6 @@ player::player()//constructor for player
 	this->score = 0;
 
 	playerImg=SDL_LoadBMP("../src/images/playerShip.bmp");
-	SDL_SetColorKey(playerImg,SDL_TRUE,SDL_MapRGB(playerImg->format,0,128,0));
 }
 
 player::~player()
@@ -88,7 +87,7 @@ void player::setScore(int value)
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 
-		int i=0;
+		
 		startImg=SDL_LoadBMP("../src/images/start.bmp");
 		bigAst[0]=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");
 		bigAst[1]=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
@@ -107,10 +106,7 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		aLazerCover[0]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
 		aLazerCover[1]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
 		aLazerCover[2]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
-	for(i=0;i<3;i++){
-		SDL_SetColorKey(bigAst[i],SDL_TRUE,SDL_MapRGB(bigAst[i]->format,0,238,0));
 
-	}
 
 }
 
