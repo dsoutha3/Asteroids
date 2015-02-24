@@ -6,6 +6,7 @@
 #include <ctime>
 #include <cmath>
 #include <stdio.h>
+#include <SDL2/SDL2_rotozoom.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL.h>
 

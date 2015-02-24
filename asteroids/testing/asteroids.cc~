@@ -87,7 +87,7 @@ void player::setScore(int value)
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 
-		int i=0;
+		
 		startImg=SDL_LoadBMP("../src/images/start.bmp");
 		bigAst[0]=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");
 		bigAst[1]=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");

@@ -23,6 +23,11 @@ SDL_Rect aLazerCoverPos[3];
 int rndVelX[3];
 int rndVelY[3];
 
+//Player Ship
+int angle=0;
+bool move[3]={0,0,0};
+float playerX=600, playerY=325;
+
 //FUNCTION DECLARATIONS
 void createWindow();
 void enableAlienPilot();
@@ -31,30 +36,36 @@ void enableAlienPilot();
 class player
 {
 	public:
-	player();
-	~player();
-	int getScore();
-	void setScore(int);
-		
-	SDL_Surface *playerImg=NULL;
-	SDL_Rect playerPos;
-	
+                player();
+                ~player();
+                int getScore();
+                void setScore(int);
+                SDL_Surface *playerImg;
+                SDL_Surface *playerRotated;
+                SDL_Rect playerPos;
 
 	private:
-	int playerX, playerY, lives, score;
+	int lives, score;
 
 
 };
 
 player::player()//constructor for player
 {
-	playerPos.x=(SCREEN_WIDTH /2);
-	playerPos.y=(SCREEN_HEIGHT /2);
+	playerImg=SDL_LoadBMP("../src/images/playerShip.bmp");
+        playerRotated = rotozoomSurface (playerImg,angle,1.0,0);
+        playerPos.x = playerX;
+        playerPos.y = playerY;
+        playerPos.w = 0;
+        playerPos.h = 0;
+
+        playerPos.x+=playerRotated->w/2-playerImg->w/2;
+        playerPos.y+=playerRotated->h/2-playerImg->h/2;
+
 
 	this->lives = 3;
 	this->score = 0;
 
-	playerImg=SDL_LoadBMP("../src/images/playerShip.bmp");
 }
 
 player::~player()
@@ -187,7 +198,7 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],playerVel=0,currentT=0;
+	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],currentT=0;
 	bool running = true;
 	createWindow();
 	computer START;
@@ -240,10 +251,10 @@ int main(int argc,char* argv[])
 				SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));  //re-paint black to prevent smear
 
 				//space ship blit
-				SDL_BlitSurface(PLAYER.playerImg, NULL, screen, &PLAYER.playerPos);
-					//ship movement
-					
-
+                                PLAYER.playerPos.x-=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
+                                PLAYER.playerPos.y-=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
+                                PLAYER.playerRotated = rotozoomSurface (PLAYER.playerImg,angle,1.0,0);
+                                SDL_BlitSurface(PLAYER.playerRotated, NULL, screen, &PLAYER.playerPos);
 
 
 
@@ -263,8 +274,8 @@ int main(int argc,char* argv[])
 					if (alienShipPos.x>=SCREEN_WIDTH-65)
 						alienShipPos.x=20;
 					else if(alienShipPos.y<=14)
-						alienShipPos.y=SCREEN_HEIGHT-90;							
-	
+						alienShipPos.y=SCREEN_HEIGHT-90;
+
 				//off-screen detecion, wrap back around for player
 					if (PLAYER.playerPos.x>=SCREEN_WIDTH-65)
 						PLAYER.playerPos.x=10;
@@ -276,19 +287,26 @@ int main(int argc,char* argv[])
 						PLAYER.playerPos.y=SCREEN_HEIGHT-10;	
 
 
-				
+
 				SDL_Delay(25); //so all key presses are read
-				
+
 				if(SDL_PollEvent( &e))
 				{
 					if( e.type == SDL_KEYDOWN && e.key.repeat == 0)
-					{	
+					{
 						switch(e.key.keysym.sym)
-						{			
-														
-							case SDLK_UP:
-							playerVel=-6;
-							break;
+						{
+                                                        case SDLK_UP:
+                                                        move[0]=TRUE;
+                                                        break;
+
+                                                        case SDLK_RIGHT:
+                                                        move[1]=TRUE;
+                                                        break;
+
+                                                        case SDLK_LEFT:
+                                                        move[2]=TRUE;
+                                                        break;
 
 							case SDLK_ESCAPE:
 							exit(0);
@@ -298,30 +316,59 @@ int main(int argc,char* argv[])
 							break;
 						}
 					}
-								
+
 					else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
-					{	
+					{
 						switch(e.key.keysym.sym)
 						{
-							case SDLK_UP:					
-							playerVel=0;
-							break;
-						}
-					}	
-				}				
-				//player velocity adjustments
-				PLAYER.playerPos.y+=playerVel;
+                                                        case SDLK_UP:
+                                                        move[0]=FALSE;
+                                                        break;
 
-				for (i=0;i<3;i++) 	
-				{					
+                                                        case SDLK_RIGHT:
+                                                        move[1]=FALSE;
+                                                        break;
+
+                                                        case SDLK_LEFT:
+                                                        move[2]=FALSE;
+                                                        break;
+
+                                                        default:
+                                                        break;
+						}
+					}
+				}
+				//player velocity adjustments
+                                if(move[0] == TRUE) // UP key
+                                {
+                                        playerX-=cos(angle*M_PI/180.0)*2.0;
+                                        playerY-=sin(angle*M_PI/180.0)*2.0;
+                                        PLAYER.playerPos.x = playerX;
+                                        PLAYER.playerPos.y = playerY;
+                                }
+                                if(move[1] == TRUE) // RIGHT key
+                                {
+                                        angle-=3;
+                                        PLAYER.playerPos.x+=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
+                                        PLAYER.playerPos.y+=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
+                                }
+                                if(move[2] == TRUE) // LEFT key
+                                {
+                                        angle+=3;
+                                        PLAYER.playerPos.x+=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
+                                        PLAYER.playerPos.y+=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
+                                }
+				//
+				for (i=0;i<3;i++)
+				{
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);//blit first wave of big asteroids	
 					SDL_BlitSurface(aLazer[i],NULL,screen,&aLazerPos[i]);//blit Lazers
 					SDL_BlitSurface(aLazerCover[i],NULL,screen,&aLazerCoverPos[i]);
 				}
 				SDL_BlitSurface(alienShip,NULL,screen,&alienShipPos);//blit alien
-				
-				
-								
+
+
+
 				for(halfK=0;halfK<3;halfK++) //to loops velocitys
 				{
 					bigAstPos[halfK].x+=rndVel[k]; //K increase evey two times that halfk does
