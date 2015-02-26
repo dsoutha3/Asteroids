@@ -5,11 +5,13 @@
 
 SDL_Window *window=NULL;
 SDL_Surface *screen=NULL;
+
 //ASTEROID SURFACES
 SDL_Surface *bigAst[3]={NULL};
 SDL_Surface *medAst[2]={NULL};
 SDL_Surface *smallAst[3]={NULL};
 SDL_Rect bigAstPos[3];
+bool bigAstVisible[3]={true,true,true}; //global scope so pilot can use the data
 
 //Alien
 SDL_Surface *alienShip=NULL;
@@ -18,6 +20,12 @@ SDL_Surface *aLazerCover[3]={NULL};
 SDL_Rect alienShipPos;
 SDL_Rect aLazerPos[3];
 SDL_Rect aLazerCoverPos[3];
+
+//kaboom
+SDL_Surface *explosion;
+SDL_Rect explosionPos;
+SDL_Rect explosionSize;
+
 //StartMenu
 
 int rndVelX[3];
@@ -118,8 +126,7 @@ computer::computer() //constructer loads all images, but doesn't blit anything y
 		aLazer[0]=SDL_LoadBMP("../src/images/aLazer.bmp");
 		aLazer[1]=SDL_LoadBMP("../src/images/aLazer.bmp");
 		aLazer[2]=SDL_LoadBMP("../src/images/aLazer.bmp");
-		aLazerCover[0]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
-		aLazerCover[1]=SDL_LoadBMP("../src/images/aLazerCover.bmp");
+		explosion=SDL_LoadBMP("../src/images/Explosion2.bmp");
 
 }
 
@@ -190,8 +197,6 @@ void computer::getStartPos(void)
 		rndYStart=rand() % (SCREEN_HEIGHT); //start them in or near screen.
 		bigAstPos[i].x=rndXStart;
 		bigAstPos[i].y=rndYStart; //for start positions
-		cout << "bigAstPosx"<<i<<" = "<<bigAstPos[i].x << endl;
-		cout << "bigAstPosy"<<i<<" = "<<bigAstPos[i].y << endl;
 	}
 }
 
@@ -199,8 +204,14 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],visible,currentT=0;
-	int aLazerVisible[3]={TRUE}, bigAstVisible[3]={TRUE};		
+	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],visible,currentT=0,fade=255;
+	bool aLazerVisible[3]={true,true,true},aLazerDeployed=false,BA_HitCheck[3]={false,false,false}; 
+			
+	while (j<3)
+{	
+	cout << bigAstVisible[3] << endl;
+	j++;
+}
 	bool running = true;
 	createWindow();
 	computer START;
@@ -258,8 +269,8 @@ int main(int argc,char* argv[])
                                 PLAYER.playerRotated = rotozoomSurface (PLAYER.playerImg,angle,1.0,0);
                                 SDL_BlitSurface(PLAYER.playerRotated, NULL, screen, &PLAYER.playerPos);
 
-
-
+				
+				
 				for(j=0;j<3;j++) //off-screen detection, wrap back around for all images
 				{
 					if (bigAstPos[j].x>=SCREEN_WIDTH)
@@ -364,11 +375,8 @@ int main(int argc,char* argv[])
 				{
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);//blit first wave of big asteroids	
 					SDL_BlitSurface(aLazer[i],NULL,screen,&aLazerPos[i]);//blit Lazers
-					SDL_BlitSurface(aLazerCover[i],NULL,screen,&aLazerCoverPos[i]);
 				}
 				SDL_BlitSurface(alienShip,NULL,screen,&alienShipPos);//blit alien
-
-
 
 				for(halfK=0;halfK<3;halfK++) //to loops velocitys
 				{
@@ -384,35 +392,42 @@ int main(int argc,char* argv[])
 				//lasers keeping position covered up
 				if (currentT<1) //if less than a second, keep lasers hidden.
 				{				
-					for(i=0;i<3;i++)					
-					{					
+									
 				
-						aLazerPos[0].x=alienShipPos.x+(alienShip->w*.47);;
-						aLazerPos[0].y=alienShipPos.y;
-						aLazerPos[1].x=alienShipPos.x+10;
-						aLazerPos[1].y=alienShipPos.y+(alienShip->h*.75);
-						aLazerPos[2].x=alienShipPos.x+(alienShip->w-15);
-						aLazerPos[2].y=alienShipPos.y+(alienShip->h*.75);
-						SDL_SetSurfaceAlphaMod(aLazer[i],0);
-						aLazerVisible[i]=FALSE;
+					aLazerPos[0].x=alienShipPos.x+(alienShip->w*.47);;
+					aLazerPos[0].y=alienShipPos.y;
+					aLazerPos[1].x=alienShipPos.x+10;
+					aLazerPos[1].y=alienShipPos.y+(alienShip->h*.75);
+					aLazerPos[2].x=alienShipPos.x+(alienShip->w-15);
+					aLazerPos[2].y=alienShipPos.y+(alienShip->h*.75);
+					aLazerDeployed=false;					
+					for(i=0;i<3;i++)					
+					{		
+							aLazerVisible[i]=false;
 					}
-
+					fade=255;// setting fade back to max opacity			
 
 				}
 				else   //else shoot a laser
 				{	
 					//veloity for lasers					
-					for(i=0;i<3;i++)					
-					{
-						SDL_SetSurfaceAlphaMod(aLazer[i],255); //unhide lazers
-						aLazerVisible[i]=TRUE;				
+					if (aLazerDeployed==false)
+					{					
+						for(i=0;i<3;i++)					
+						{
+							 //unhide lazers
+							aLazerVisible[i]=true;
+						}	
+										
 					}					
+					aLazerDeployed=true;					
 					aLazerPos[0].y-=5;
 					aLazerPos[1].x-=5;
 					aLazerPos[1].y+=5;
 					aLazerPos[2].x+=5;
 					aLazerPos[2].y+=5;
-					
+					//fade with distance
+					fade-=3;
 					//wrap around for alien shooting.					
 					for(i=0;i<3;i++)
 					{
@@ -441,24 +456,39 @@ int main(int argc,char* argv[])
 						}		
 						if(aLazerPos[i].x+aLazerPos[i].w<bigAstPos[j].x||aLazerPos[i].x>bigAstPos[j].x+bigAstPos[j].w||aLazerPos[i].y+aLazerPos[i].h<bigAstPos[j].y||aLazerPos[i].y>bigAstPos[j].y+bigAstPos[j].h)
 						{			
-							//bigAstvisible=TRUE;
+							//cout<< bigAstVisible[j] <<endl; j++;
 						}
 						else 
 						{				
-							if(aLazerVisible[i]==TRUE)	
+							if(bigAstVisible[j]==true&&aLazerVisible[i]==true)	
 							{	
-								aLazerVisible[i]=FALSE;
-								bigAstVisible[j]=FALSE;							 
-								SDL_SetSurfaceAlphaMod(bigAst[j], 0);
-								SDL_SetSurfaceAlphaMod(aLazer[i], 0);
-							}
+								cout <<"comparing ast " <<j <<" to lazer " <<i <<endl;
+								aLazerVisible[i]=false;
+								bigAstVisible[j]=false;
+															
+							}				
 						}
 					i++;
 					}	
-				}	
-			
+					for(i=0;i<3;i++)
+					{
+						if(BA_HitCheck[i]==false){						
+							if(bigAstVisible[i]==false){	
+								SDL_SetSurfaceAlphaMod(bigAst[i], 0);
+								BA_HitCheck[i]=true;
+								explosionSize.w=explosion->w/4;
+								explosionSize.h=explosion->h/4;
+								SDL_BlitSurface(explosion,&explosionSize,screen,&bigAstPos[i]);
+							}}	
+						if(aLazerVisible[i]==false)							
+							SDL_SetSurfaceAlphaMod(aLazer[i], 0);
+						else
+							SDL_SetSurfaceAlphaMod(aLazer[i],fade);				
+					}				
 
+				}
 	
+				
 
 		return(0);
 }
@@ -495,52 +525,53 @@ void enableAlienPilot()
 	int l=0;	
 	for(l=0;l<3;l++)
 	{						
-				
-					//Asteroid coming down towards top left corner of ship.		
-		if (((bigAstPos[l].y>=alienShipPos.y-80)&&(bigAstPos[l].y<=alienShipPos.y))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
-		{									
-			alienShipPos.x+=4;
-			alienShipPos.y+=4;
-		}
-					//Asteroid coming up towards bottom left corner of ship.
-		else if (((bigAstPos[l].y<=alienShipPos.y+150)&&(bigAstPos[l].y>=alienShipPos.y+100))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
-		{	
-			alienShipPos.x+=4;
-			alienShipPos.y-=4;
-		}
-					//Asteroid coming down towards top right corner of ship.
-		else if(((bigAstPos[l].x<=alienShipPos.x+150)&&(bigAstPos[l].x>=alienShipPos.x+100))&&((bigAstPos[l].y<=alienShipPos.y+80)&&(bigAstPos[l].y>=alienShipPos.y)))
-		{
-			alienShipPos.x-=4;
-			alienShipPos.y+=4;
-		}
-					//Asteroid coming up toward bottom right corner of ship.
-		else if(((bigAstPos[l].x<=alienShipPos.x+150)&&(bigAstPos[l].x>=alienShipPos.x+100))&&((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100)))
-		{
-			alienShipPos.x-=10;
-			alienShipPos.y+=7;
-		}
-					//Asteroid coming toward left side of ship.
-		else if(((bigAstPos[l].y>=alienShipPos.y+5)&&(bigAstPos[l].y<=alienShipPos.y+95))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
-		{
-			alienShipPos.x+=7;
-		}						
+		if(bigAstVisible[l]==true)			
+		{			//Asteroid coming down towards top left corner of ship.		
+			if (((bigAstPos[l].y>=alienShipPos.y-80)&&(bigAstPos[l].y<=alienShipPos.y))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
+			{									
+				alienShipPos.x+=4;
+				alienShipPos.y+=4;
+			}
+						//Asteroid coming up towards bottom left corner of ship.
+			else if (((bigAstPos[l].y<=alienShipPos.y+150)&&(bigAstPos[l].y>=alienShipPos.y+100))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
+			{	
+				alienShipPos.x+=4;
+				alienShipPos.y-=4;
+			}
+						//Asteroid coming down towards top right corner of ship.
+			else if(((bigAstPos[l].x<=alienShipPos.x+150)&&(bigAstPos[l].x>=alienShipPos.x+100))&&((bigAstPos[l].y<=alienShipPos.y+80)&&(bigAstPos[l].y>=alienShipPos.y)))
+			{
+				alienShipPos.x-=4;
+				alienShipPos.y+=4;
+			}
+						//Asteroid coming up toward bottom right corner of ship.
+			else if(((bigAstPos[l].x<=alienShipPos.x+150)&&(bigAstPos[l].x>=alienShipPos.x+100))&&((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100)))
+			{
+				alienShipPos.x-=10;
+				alienShipPos.y+=7;
+			}
+						//Asteroid coming toward left side of ship.
+			else if(((bigAstPos[l].y>=alienShipPos.y+5)&&(bigAstPos[l].y<=alienShipPos.y+95))&&((bigAstPos[l].x>=alienShipPos.x-80)&&(bigAstPos[l].x<=alienShipPos.x)))
+			{
+				alienShipPos.x+=7;
+			}						
 					//Asteroid coming toward mid right of ship.
-		else if(((bigAstPos[l].y>=alienShipPos.y+5)&&(bigAstPos[l].y<=alienShipPos.y+95))&&((bigAstPos[l].x>=alienShipPos.x+180)&&(bigAstPos[l].x<=alienShipPos.x)))
-		{
-			alienShipPos.x-=10;
-		}
-					//Asteroid coming toward top side of ship.
-		else if(((bigAstPos[l].y>=alienShipPos.y-80)&&(bigAstPos[l].y<=alienShipPos.y))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
-		{
-			alienShipPos.y+=14;
-			alienShipPos.x-=10;
-		}
-					//Asteroid coming from back side.
-		else if(((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
-		{
-			alienShipPos.y+=7;
-			alienShipPos.x+=7;
-		}
-	}						
+			else if(((bigAstPos[l].y>=alienShipPos.y+5)&&(bigAstPos[l].y<=alienShipPos.y+95))&&((bigAstPos[l].x>=alienShipPos.x+180)&&(bigAstPos[l].x<=alienShipPos.x)))
+			{
+				alienShipPos.x-=10;
+			}
+						//Asteroid coming toward top side of ship.
+			else if(((bigAstPos[l].y>=alienShipPos.y-80)&&(bigAstPos[l].y<=alienShipPos.y))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
+			{
+				alienShipPos.y+=14;
+				alienShipPos.x-=10;
+			}
+						//Asteroid coming from back side.
+			else if(((bigAstPos[l].y<=alienShipPos.y+180)&&(bigAstPos[l].y>=alienShipPos.y+100))&&((bigAstPos[l].x>=alienShipPos.x+5)&&(bigAstPos[l].x<=alienShipPos.x+95)))
+			{
+				alienShipPos.y+=7;
+				alienShipPos.x+=7;
+			}
+		}						
+	}
 }
