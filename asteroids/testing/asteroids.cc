@@ -59,7 +59,7 @@ class player
 
 player::player()//constructor for player
 {
-	playerImg=SDL_LoadBMP("../src/images/playerShip.bmp");
+	playerImg=IMG_Load("../src/images/playerShip.png");
         playerRotated = rotozoomSurface (playerImg,angle,1.0,0);
         playerPos.x = playerX;
         playerPos.y = playerY;
@@ -106,23 +106,25 @@ void player::setScore(int value)
 computer::computer() //constructer loads all images, but doesn't blit anything yet.
 {
 
-		
+		int imgFlags = IMG_INIT_PNG;
+		if(!(IMG_Init(imgFlags)&imgFlags))
+			cout << "Error" << IMG_GetError() << endl;
 		startImg=SDL_LoadBMP("../src/images/start.bmp");
-		bigAst[0]=SDL_LoadBMP("../src/images/bigBrownAst1.bmp");
-		bigAst[1]=SDL_LoadBMP("../src/images/bigGreyAst1.bmp");
-		bigAst[2]=SDL_LoadBMP("../src/images/bigGreyAst2.bmp");
-		medAst[0]=SDL_LoadBMP("../src/images/medBrownAst1.bmp");
-		medAst[1]=SDL_LoadBMP("../src/images/medGreyAst1.bmp");
-		medAst[2]=SDL_LoadBMP("../src/images/medGreyAst2.bmp");
-		smallAst[0]=SDL_LoadBMP("../src/images/smallGreyAst1.bmp");
-		smallAst[1]=SDL_LoadBMP("../src/images/smallGreyAst2.bmp");
-		smallAst[2]=SDL_LoadBMP("../src/images/smallBrowAst1.bmp");
-		smallAst[3]=SDL_LoadBMP("../src/images/smallBrownAst2.bmp");
-		alienShip=SDL_LoadBMP("../src/images/alienShip.bmp");
-		aLazer[0]=SDL_LoadBMP("../src/images/aLazer.bmp");
-		aLazer[1]=SDL_LoadBMP("../src/images/aLazer.bmp");
-		aLazer[2]=SDL_LoadBMP("../src/images/aLazer.bmp");
-		explosion=SDL_LoadBMP("../src/images/Explosion2.bmp");
+		bigAst[0]=IMG_Load("../src/images/bigBrownAst1.png");
+		bigAst[1]=IMG_Load("../src/images/bigGreyAst1.png");
+		bigAst[2]=IMG_Load("../src/images/bigGreyAst2.png");
+		/*medAst[0]=IMG_Load("../src/images/medBrownAst1.png");
+		medAst[1]=IMG_Load("../src/images/medGreyAst1.png");
+		medAst[2]=IMG_Load("../src/images/medGreyAst2.png");
+		smallAst[0]=IMG_Load("../src/images/smallGreyAst1.png");
+		smallAst[1]=IMG_Load("../src/images/smallGreyAst2.png");
+		smallAst[2]=IMG_Load("../src/images/smallBrowAst1.png");
+		smallAst[3]=IMG_Load("../src/images/smallBrownAst2.png");*/
+		alienShip=IMG_Load("../src/images/alienShip.png");
+		aLazer[0]=IMG_Load("../src/images/aLazer.png");
+		aLazer[1]=IMG_Load("../src/images/aLazer.png");
+		aLazer[2]=IMG_Load("../src/images/aLazer.png");
+		explosion=IMG_Load("../src/images/Explosion2.png");
 
 }
 
@@ -133,15 +135,15 @@ computer::~computer() //destructor frees all images and their memory, then quits
 	while (i<3)
 	{
 		SDL_FreeSurface(bigAst[i]);
-		SDL_FreeSurface(medAst[i]);
-		SDL_FreeSurface(smallAst[i]);
+		//SDL_FreeSurface(medAst[i]);
+		//SDL_FreeSurface(smallAst[i]);
 		SDL_FreeSurface(aLazer[i]);		
 		i++;
 	}
 
-	while(i<4){
-	SDL_FreeSurface(smallAst[i]);
-	i++; }
+	//while(i<4){
+	//SDL_FreeSurface(smallAst[i]);
+	//i++; }
 
 	SDL_DestroyWindow(window); //destroy window created.
 	SDL_Quit(); // quit all SDL subsystems.
@@ -390,6 +392,7 @@ int main(int argc,char* argv[])
 				{				
 									
 				
+					 // setting fade back to max opacity					
 					aLazerPos[0].x=alienShipPos.x+(alienShip->w*.47);;
 					aLazerPos[0].y=alienShipPos.y;
 					aLazerPos[1].x=alienShipPos.x+10;
@@ -397,11 +400,12 @@ int main(int argc,char* argv[])
 					aLazerPos[2].x=alienShipPos.x+(alienShip->w-15);
 					aLazerPos[2].y=alienShipPos.y+(alienShip->h*.75);
 					aLazerDeployed=false;					
-					for(i=0;i<3;i++)					
-					{		
-							aLazerVisible[i]=false;
-					}
-					fade=255;// setting fade back to max opacity			
+					if (aLazerDeployed==false){
+						for(i=0;i<3;i++)					
+						{		
+								aLazerVisible[i]=false;
+						}}
+					//fade=255;								
 
 				}
 				else   //else shoot a laser
@@ -416,14 +420,15 @@ int main(int argc,char* argv[])
 						}	
 										
 					}					
-					aLazerDeployed=true;					
+					aLazerDeployed=true;									
 					aLazerPos[0].y-=5;
 					aLazerPos[1].x-=5;
 					aLazerPos[1].y+=5;
 					aLazerPos[2].x+=5;
 					aLazerPos[2].y+=5;
 					//fade with distance
-					fade-=3;
+					//fade-=1;
+					
 					//wrap around for alien shooting.					
 					for(i=0;i<3;i++)
 					{
@@ -452,13 +457,13 @@ int main(int argc,char* argv[])
 						}		
 						if(aLazerPos[i].x+aLazerPos[i].w<bigAstPos[j].x||aLazerPos[i].x>bigAstPos[j].x+bigAstPos[j].w||aLazerPos[i].y+aLazerPos[i].h<bigAstPos[j].y||aLazerPos[i].y>bigAstPos[j].y+bigAstPos[j].h)
 						{			
-							//cout<< bigAstVisible[j] <<endl; j++;
+							//nothing happens
 						}
 						else 
 						{				
 							if(bigAstVisible[j]==true&&aLazerVisible[i]==true)	
 							{	
-								cout <<"comparing ast " <<j <<" to lazer " <<i <<endl;
+								
 								aLazerVisible[i]=false;
 								bigAstVisible[j]=false;
 															
@@ -479,7 +484,7 @@ int main(int argc,char* argv[])
 						if(aLazerVisible[i]==false)							
 							SDL_SetSurfaceAlphaMod(aLazer[i], 0);
 						else
-							SDL_SetSurfaceAlphaMod(aLazer[i],fade);				
+							SDL_SetSurfaceAlphaMod(aLazer[i],255);				
 					}				
 
 				}

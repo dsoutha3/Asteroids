@@ -1,4 +1,4 @@
-CFLAGS = -Wall -L../lib `sdl2-config --libs --cflags` -lSDL2_gfx
+CFLAGS = -Wall -L../lib `sdl2-config --libs --cflags` -lSDL2_gfx -lSDL2_image
 INC = -I ../inc/
 CXX = g++ $(INC)
 SRC = $(shell /bin/ls -1 *.cc 2>/dev/null)
