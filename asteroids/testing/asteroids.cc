@@ -52,11 +52,7 @@ class player
                 SDL_Surface *playerRotated;
                 SDL_Rect playerPos;
 	private:
-	int lazerOriginX;
-	int lazerOriginY;
-
-	private:
-	int lives, score;
+		int lives, score;
 
 
 };
