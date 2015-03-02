@@ -32,8 +32,8 @@ int rndVelX[3];
 int rndVelY[3];
 
 //Player Ship
-int angle=0;
-bool move[3]={0,0,0};
+int angle=90;
+bool move[4]={0,0,0,0};
 float playerX=600, playerY=325;
 
 //FUNCTION DECLARATIONS
@@ -50,7 +50,9 @@ class player
                 void setScore(int);
                 SDL_Surface *playerImg;
                 SDL_Surface *playerRotated;
-                SDL_Rect playerPos;
+		SDL_Surface *pLaser;
+		SDL_Rect playerPos;
+		SDL_Rect pLaserPos;
 	private:
 		int lives, score;
 
@@ -60,15 +62,19 @@ class player
 player::player()//constructor for player
 {
 	playerImg=IMG_Load("../src/images/playerShip.png");
+	pLaser=IMG_Load("../src/images/pLaser.png");
         playerRotated = rotozoomSurface (playerImg,angle,1.0,0);
         playerPos.x = playerX;
         playerPos.y = playerY;
         playerPos.w = 0;
         playerPos.h = 0;
+	pLaserPos.x = playerX;
+	pLaserPos.y = playerY;
+	pLaserPos.w = 0;
+	pLaserPos.h = 0;
 
-        playerPos.x+=playerRotated->w/2-playerImg->w/2;
-        playerPos.y+=playerRotated->h/2-playerImg->h/2;
-
+        playerPos.x-=playerRotated->w/2-playerImg->w/2;
+        playerPos.y-=playerRotated->h/2-playerImg->h/2;
 
 	this->lives = 3;
 	this->score = 0;
@@ -77,6 +83,8 @@ player::player()//constructor for player
 
 player::~player()
 {
+                SDL_FreeSurface(playerImg);
+                SDL_FreeSurface(pLaser);
 }
 
 //class for asteroids and various computer duties
@@ -89,7 +97,7 @@ class computer
 	int gameStatus(void);
 	SDL_Surface *startImg=NULL;
 	SDL_Rect startPos;
-	
+
 	~computer();
 };
 
@@ -262,13 +270,11 @@ int main(int argc,char* argv[])
 				SDL_FillRect(screen,NULL,SDL_MapRGB(screen->format,0,0,0));  //re-paint black to prevent smear
 
 				//space ship blit
-                                PLAYER.playerPos.x-=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
-                                PLAYER.playerPos.y-=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
+//                                PLAYER.playerPos.x-=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
+//                                PLAYER.playerPos.y-=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
                                 PLAYER.playerRotated = rotozoomSurface (PLAYER.playerImg,angle,1.0,0);
                                 SDL_BlitSurface(PLAYER.playerRotated, NULL, screen, &PLAYER.playerPos);
 
-				
-				
 				for(j=0;j<3;j++) //off-screen detection, wrap back around for all images
 				{
 					if (bigAstPos[j].x>=SCREEN_WIDTH)
@@ -288,22 +294,20 @@ int main(int argc,char* argv[])
 						alienShipPos.y=SCREEN_HEIGHT-90;
 
 				//off-screen detecion, wrap back around for player
-					if (PLAYER.playerPos.x>=SCREEN_WIDTH-65)
-						PLAYER.playerPos.x=10;
-					else if (PLAYER.playerPos.x<=9)
-						PLAYER.playerPos.x=SCREEN_WIDTH-80;
+					if (PLAYER.playerPos.x>=SCREEN_WIDTH)
+						PLAYER.playerPos.x=0;
+					else if (PLAYER.playerPos.x<=0)
+						PLAYER.playerPos.x=SCREEN_WIDTH;
 					if (PLAYER.playerPos.y>=SCREEN_HEIGHT)
-						PLAYER.playerPos.y=2;
+						PLAYER.playerPos.y=0;
 					else if(PLAYER.playerPos.y<=0)
-						PLAYER.playerPos.y=SCREEN_HEIGHT-10;	
-
-
+						PLAYER.playerPos.y=SCREEN_HEIGHT;
 
 				SDL_Delay(25); //so all key presses are read
 
 				if(SDL_PollEvent( &e))
 				{
-					if( e.type == SDL_KEYDOWN && e.key.repeat == 0)
+					if( e.type == SDL_KEYDOWN) // && e.key.repeat == 0)
 					{
 						switch(e.key.keysym.sym)
 						{
@@ -319,6 +323,10 @@ int main(int argc,char* argv[])
                                                         move[2]=TRUE;
                                                         break;
 
+							case SDLK_SPACE:
+							move[3]=TRUE;
+							break;
+
 							case SDLK_ESCAPE:
 							exit(0);
 							break;
@@ -328,7 +336,7 @@ int main(int argc,char* argv[])
 						}
 					}
 
-					else if( e.type == SDL_KEYUP && e.key.repeat == 0 )
+					else if( e.type == SDL_KEYUP) // && e.key.repeat == 0 )
 					{
 						switch(e.key.keysym.sym)
 						{
@@ -352,23 +360,27 @@ int main(int argc,char* argv[])
 				//player velocity adjustments
                                 if(move[0] == TRUE) // UP key
                                 {
-                                        playerX-=cos(angle*M_PI/180.0)*2.0;
-                                        playerY-=sin(angle*M_PI/180.0)*2.0;
-                                        PLAYER.playerPos.x = playerX;
+                                      	playerX-=cos(angle*M_PI/180.0)*7.0;
+                               	        playerY-=sin(angle*M_PI/180.0)*7.0;
+				        PLAYER.playerPos.x = playerX;
                                         PLAYER.playerPos.y = playerY;
-                                }
+					PLAYER.pLaserPos.x = playerX;
+					PLAYER.pLaserPos.y = playerY;
+				}
                                 if(move[1] == TRUE) // RIGHT key
                                 {
-                                        angle-=3;
-                                        PLAYER.playerPos.x+=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
-                                        PLAYER.playerPos.y+=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
-                                }
+                                        angle-=2;
+                            	}
                                 if(move[2] == TRUE) // LEFT key
                                 {
-                                        angle+=3;
-                                        PLAYER.playerPos.x+=PLAYER.playerRotated->w/2-PLAYER.playerImg->w/2;
-                                        PLAYER.playerPos.y+=PLAYER.playerRotated->h/2-PLAYER.playerImg->h/2;
+                                        angle+=2;
                                 }
+				if(move[3] == TRUE)
+				{
+					SDL_BlitSurface(PLAYER.pLaser, NULL, screen, &PLAYER.pLaserPos);
+					PLAYER.pLaserPos.x-=10;
+					PLAYER.pLaserPos.y-=10;
+				}
 				for (i=0;i<3;i++)
 				{
 					SDL_BlitSurface(bigAst[i],NULL,screen,&bigAstPos[i]);//blit first wave of big asteroids	
