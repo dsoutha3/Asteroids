@@ -50,9 +50,9 @@ class player
                 void setScore(int);
                 SDL_Surface *playerImg;
                 SDL_Surface *playerRotated;
-		SDL_Surface *pLaser;
+		SDL_Surface *pLaser[5];
 		SDL_Rect playerPos;
-		SDL_Rect pLaserPos;
+		SDL_Rect pLaserPos[5];
 	private:
 		int lives, score;
 
@@ -61,17 +61,25 @@ class player
 
 player::player()//constructor for player
 {
+	int i;
 	playerImg=IMG_Load("../src/images/playerShip.png");
-	pLaser=IMG_Load("../src/images/pLaser.png");
+	pLaser[0]=IMG_Load("../src/images/pLaser.png");
+	pLaser[1]=IMG_Load("../src/images/pLaser.png");
+	pLaser[2]=IMG_Load("../src/images/pLaser.png");
+	pLaser[3]=IMG_Load("../src/images/pLaser.png");
+	pLaser[4]=IMG_Load("../src/images/pLaser.png");
         playerRotated = rotozoomSurface (playerImg,angle,1.0,0);
         playerPos.x = playerX;
         playerPos.y = playerY;
         playerPos.w = 0;
         playerPos.h = 0;
-	pLaserPos.x = playerX;
-	pLaserPos.y = playerY;
-	pLaserPos.w = 0;
-	pLaserPos.h = 0;
+	for(i=0;i<5;i++)
+	{
+		pLaserPos[i].x = playerX;
+		pLaserPos[i].y = playerY;
+		pLaserPos[i].w = 0;
+		pLaserPos[i].h = 0;
+	}
 
         playerPos.x-=playerRotated->w/2-playerImg->w/2;
         playerPos.y-=playerRotated->h/2-playerImg->h/2;
@@ -83,8 +91,6 @@ player::player()//constructor for player
 
 player::~player()
 {
-                SDL_FreeSurface(playerImg);
-                SDL_FreeSurface(pLaser);
 }
 
 //class for asteroids and various computer duties
@@ -210,7 +216,7 @@ int main(int argc,char* argv[])
 {
 
 //start here
-	int menu=0,i=0,j=0,k=0,halfK=0,rndVel[6],visible,currentT=0,fade=255;
+	int menu=0,i=0,j=0,k=0,laser=0, halfK=0,rndVel[6],visible,currentT=0,fade=255;
 	bool aLazerVisible[3]={true,true,true},aLazerDeployed=false,BA_HitCheck[3]={false,false,false}; 
 			
 	while (j<3)
@@ -253,7 +259,14 @@ int main(int argc,char* argv[])
 	{
 		rndVel[j]=START.getVel();
 	}
-
+	if(laser>5)
+	{
+		laser = 0;
+	}
+	PLAYER.pLaserPos[laser].x = playerX;
+	PLAYER.pLaserPos[laser].y = playerY;
+        PLAYER.playerPos.x = playerX;
+        PLAYER.playerPos.y = playerY;
 	SDL_Event mainEv;	
 		while(running)
 		{
@@ -295,13 +308,13 @@ int main(int argc,char* argv[])
 
 				//off-screen detecion, wrap back around for player
 					if (PLAYER.playerPos.x>=SCREEN_WIDTH)
-						PLAYER.playerPos.x=0;
+						playerX = 0;
 					else if (PLAYER.playerPos.x<=0)
-						PLAYER.playerPos.x=SCREEN_WIDTH;
+						playerX = SCREEN_WIDTH;
 					if (PLAYER.playerPos.y>=SCREEN_HEIGHT)
-						PLAYER.playerPos.y=0;
+						playerY = 0;
 					else if(PLAYER.playerPos.y<=0)
-						PLAYER.playerPos.y=SCREEN_HEIGHT;
+						playerY = SCREEN_HEIGHT;
 
 				SDL_Delay(25); //so all key presses are read
 
@@ -352,6 +365,10 @@ int main(int argc,char* argv[])
                                                         move[2]=FALSE;
                                                         break;
 
+							case SDLK_SPACE:
+							move[3]=FALSE;
+							break;
+
                                                         default:
                                                         break;
 						}
@@ -364,8 +381,6 @@ int main(int argc,char* argv[])
                                	        playerY-=sin(angle*M_PI/180.0)*7.0;
 				        PLAYER.playerPos.x = playerX;
                                         PLAYER.playerPos.y = playerY;
-					PLAYER.pLaserPos.x = playerX;
-					PLAYER.pLaserPos.y = playerY;
 				}
                                 if(move[1] == TRUE) // RIGHT key
                                 {
@@ -377,9 +392,10 @@ int main(int argc,char* argv[])
                                 }
 				if(move[3] == TRUE)
 				{
-					SDL_BlitSurface(PLAYER.pLaser, NULL, screen, &PLAYER.pLaserPos);
-					PLAYER.pLaserPos.x-=10;
-					PLAYER.pLaserPos.y-=10;
+					SDL_BlitSurface(PLAYER.pLaser[laser], NULL, screen, &PLAYER.pLaserPos[laser]);
+					PLAYER.pLaserPos[laser].x-=10;
+					PLAYER.pLaserPos[laser].y-=10;
+					laser++;
 				}
 				for (i=0;i<3;i++)
 				{
